@@ -1,0 +1,54 @@
+<div class="catalogo-container">
+  <h1>Catálogo de Productos</h1>
+  
+  <!-- Barra de búsqueda -->
+  <div class="search-bar">
+    <input 
+      type="text" 
+      [(ngModel)]="searchTerm" 
+      placeholder="Buscar productos..." 
+      (input)="searchProductos()"
+      [disabled]="isLoading"
+    >
+    <button (click)="searchProductos()" [disabled]="isLoading">
+      {{ isLoading ? 'Buscando...' : 'Buscar' }}
+    </button>
+  </div>
+
+  <!-- Mensajes de estado -->
+  <div *ngIf="errorMessage" class="error-message">
+    ⚠️ {{ errorMessage }}
+  </div>
+
+  <div *ngIf="isLoading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Cargando productos...</p>
+  </div>
+
+  <!-- Lista de productos -->
+  <div *ngIf="!isLoading" class="productos-grid">
+    <div *ngFor="let producto of filteredProductos" class="producto-card">
+      <div class="image-container">
+        <img 
+          [src]="producto.imagenUrl || defaultImage" 
+          [alt]="producto.nombre"
+          (error)="handleImageError($event)"
+          [class.failed]="!producto.imagenUrl"
+        >
+      </div>
+      <div class="producto-info">
+        <h3>{{ producto.nombre }}</h3>
+        <p class="price">{{ producto.precio | currency:'EUR':'symbol':'1.2-2' }}</p>
+        <p class="category">{{ producto.categoria || 'General' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje para resultados vacíos -->
+  <div *ngIf="!isLoading && !filteredProductos.length" class="empty-results">
+    <p>No se encontraron productos</p>
+    <button (click)="searchTerm = ''; loadProductos()">
+      Mostrar todos
+    </button>
+  </div>
+</div>
