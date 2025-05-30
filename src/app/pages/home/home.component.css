@@ -1,0 +1,103 @@
+/* Estilos generales */
+.banner-section {
+  position: relative;
+  background: url('https://images.unsplash.com/photo-1605236453806-6ff36851218e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center;
+  background-size: cover;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+}
+
+.dark-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.section-title {
+  font-weight: 700;
+  color: #333;
+  position: relative;
+  padding-bottom: 15px;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, #ffc107, #dc3545);
+}
+
+/* Tarjetas de características */
+.feature-card {
+  padding: 30px 20px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Cartas destacadas */
+.card {
+  transition: transform 0.3s ease;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.placeholder-img {
+  height: 200px;
+  background: linear-gradient(45deg, #6c757d, #495057);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.placeholder-img::before {
+  content: 'Imagen de la carta';
+}
+
+.placeholder-map::before {
+  content: 'Mapa de ubicación';
+}
+
+/* Botones */
+.btn {
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-primary {
+  border-width: 2px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .banner-section {
+    min-height: 50vh;
+  }
+  
+  .display-3 {
+    font-size: 2.5rem;
+  }
+  
+  .lead {
+    font-size: 1.1rem;
+  }
+}

@@ -1,54 +1,321 @@
-<div class="catalogo-container">
-  <h1>Catálogo de Productos</h1>
-  
-  <!-- Barra de búsqueda -->
-  <div class="search-bar">
-    <input 
-      type="text" 
-      [(ngModel)]="searchTerm" 
-      placeholder="Buscar productos..." 
-      (input)="searchProductos()"
-      [disabled]="isLoading"
-    >
-    <button (click)="searchProductos()" [disabled]="isLoading">
-      {{ isLoading ? 'Buscando...' : 'Buscar' }}
-    </button>
-  </div>
-
-  <!-- Mensajes de estado -->
-  <div *ngIf="errorMessage" class="error-message">
-    ⚠️ {{ errorMessage }}
-  </div>
-
-  <div *ngIf="isLoading" class="loading-spinner">
-    <div class="spinner"></div>
-    <p>Cargando productos...</p>
-  </div>
-
-  <!-- Lista de productos -->
-  <div *ngIf="!isLoading" class="productos-grid">
-    <div *ngFor="let producto of filteredProductos" class="producto-card">
-      <div class="image-container">
-        <img 
-          [src]="producto.imagenUrl || defaultImage" 
-          [alt]="producto.nombre"
-          (error)="handleImageError($event)"
-          [class.failed]="!producto.imagenUrl"
-        >
+<div class="catalogo-container" role="main">
+  <div class="main-content">
+    <!-- Sidebar como nav -->
+    <nav class="filters-sidebar" aria-label="Filtros de búsqueda">
+      <div class="filter-section">
+        <h2 id="filters-heading">Filtrar por</h2>
+        <button class="clear-filters" (click)="resetFilters()" aria-label="Limpiar todos los filtros">
+          Limpiar todos los filtros
+        </button>
       </div>
-      <div class="producto-info">
-        <h3>{{ producto.nombre }}</h3>
-        <p class="price">{{ producto.precio | currency:'EUR':'symbol':'1.2-2' }}</p>
-        <p class="category">{{ producto.categoria || 'General' }}</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Mensaje para resultados vacíos -->
-  <div *ngIf="!isLoading && !filteredProductos.length" class="empty-results">
-    <p>No se encontraron productos</p>
-    <button (click)="searchTerm = ''; loadProductos()">
-      Mostrar todos
-    </button>
+      
+      <!-- Filtro de búsqueda -->
+      <section aria-labelledby="search-heading">
+        <h3 id="search-heading" class="visually-hidden">Búsqueda</h3>
+        <div class="search-filter">
+          <label for="search-input" class="visually-hidden">Buscar cartas Pokémon</label>
+          <input 
+            id="search-input"
+            type="search" 
+            [(ngModel)]="searchTerm" 
+            placeholder="Buscar cartas..."
+            (keyup.enter)="applyFilters()"
+            [disabled]="isLoading"
+            aria-describedby="search-help"
+          >
+          <button (click)="applyFilters()" [disabled]="isLoading">
+            Buscar <span class="visually-hidden">cartas Pokémon</span>
+          </button>
+          <span id="search-help" class="visually-hidden">Presiona Enter para buscar</span>
+        </div>
+      </section>
+      
+      <!-- Filtro de categorías -->
+      <section aria-labelledby="categories-heading" *ngIf="categorias.length > 0">
+        <h3 id="categories-heading">Categorías</h3>
+        <div class="filter-options" role="group" aria-labelledby="categories-heading">
+          <div *ngFor="let categoria of categorias" class="filter-option">
+            <input 
+              type="checkbox" 
+              [id]="'cat-' + categoria.id"
+              [checked]="selectedCategories.includes(categoria.id)"
+              (change)="toggleCategory(categoria.id)"
+              [disabled]="isLoading"
+            >
+            <label [for]="'cat-' + categoria.id">
+              {{ categoria.nombre }}
+              <span class="item-count">({{ countProductsByCategory(categoria.id) }})</span>
+            </label>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Filtro de colecciones -->
+      <section aria-labelledby="collections-heading" *ngIf="colecciones.length > 0">
+        <h3 id="collections-heading">Colecciones</h3>
+        <div class="filter-options" role="group" aria-labelledby="collections-heading">
+          <div *ngFor="let coleccion of colecciones" class="filter-option">
+            <input 
+              type="checkbox" 
+              [id]="'col-' + coleccion.id"
+              [checked]="selectedCollections.includes(coleccion.id)"
+              (change)="toggleCollection(coleccion.id)"
+              [disabled]="isLoading"
+            >
+            <label [for]="'col-' + coleccion.id">
+              {{ coleccion.nombre }}
+              <span class="item-count">({{ countProductsByCollection(coleccion.id) }})</span>
+            </label>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Filtro de rarezas -->
+      <section aria-labelledby="rarities-heading" *ngIf="rarezas.length > 0">
+        <h3 id="rarities-heading">Rarezas</h3>
+        <div class="filter-options" role="group" aria-labelledby="rarities-heading">
+          <div *ngFor="let rareza of rarezas" class="filter-option">
+            <input 
+              type="checkbox" 
+              [id]="'rar-' + rareza.id"
+              [checked]="selectedRarities.includes(rareza.id)"
+              (change)="toggleRarity(rareza.id)"
+              [disabled]="isLoading"
+            >
+            <label [for]="'rar-' + rareza.id">
+              {{ rareza.nombre }}
+              <span class="item-count">({{ countProductsByRarity(rareza.id) }})</span>
+            </label>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Filtro de estado del producto -->
+      <section aria-labelledby="conditions-heading" *ngIf="estadosProducto.length > 0">
+        <h3 id="conditions-heading">Estado</h3>
+        <div class="filter-options" role="group" aria-labelledby="conditions-heading">
+          <div *ngFor="let estado of estadosProducto" class="filter-option">
+            <input 
+              type="checkbox" 
+              [id]="'est-' + estado.id"
+              [checked]="selectedConditions.includes(estado.id)"
+              (change)="toggleCondition(estado.id)"
+              [disabled]="isLoading"
+            >
+            <label [for]="'est-' + estado.id">
+              {{ estado.descripcion }}
+              <span class="item-count">({{ countProductsByCondition(estado.id) }})</span>
+            </label>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Filtro de precio -->
+      <section aria-labelledby="price-heading">
+        <h3 id="price-heading">Rango de precios</h3>
+        <div class="price-range">
+          <span id="min-price">{{ currentPriceRange.min | currency:'EUR':'symbol':'1.0-0' }}</span>
+          <span aria-hidden="true"> - </span>
+          <span id="max-price">{{ currentPriceRange.max | currency:'EUR':'symbol':'1.0-0' }}</span>
+        </div>
+        <div class="range-slider">
+          <label for="min-price-input" class="visually-hidden">Precio mínimo</label>
+          <input 
+            id="min-price-input"
+            type="range" 
+            [min]="priceRange.min" 
+            [max]="priceRange.max" 
+            [(ngModel)]="currentPriceRange.min" 
+            (change)="updatePriceRange()"
+            [disabled]="isLoading"
+            aria-labelledby="min-price"
+          >
+          <label for="max-price-input" class="visually-hidden">Precio máximo</label>
+          <input 
+            id="max-price-input"
+            type="range" 
+            [min]="priceRange.min" 
+            [max]="priceRange.max" 
+            [(ngModel)]="currentPriceRange.max" 
+            (change)="updatePriceRange()"
+            [disabled]="isLoading"
+            aria-labelledby="max-price"
+          >
+        </div>
+      </section>
+      
+      <!-- Filtro de fecha -->
+      <section aria-labelledby="date-heading" *ngIf="availableYears.length > 0">
+        <h3 id="date-heading">Año</h3>
+        <div class="filter-options">
+          <select 
+            id="year-select" 
+            [(ngModel)]="selectedYear" 
+            (change)="applyFilters()"
+            [disabled]="isLoading"
+          >
+            <option value="">Todos los años</option>
+            <option *ngFor="let year of availableYears" [value]="year">{{ year }}</option>
+          </select>
+        </div>
+      </section>
+      
+      <!-- Filtro de valoración -->
+      <section aria-labelledby="rating-heading">
+        <h3 id="rating-heading">Valoración</h3>
+        <div class="filter-options" role="group" aria-labelledby="rating-heading">
+          <div *ngFor="let rating of [4,3,2,1]; let i = index" class="filter-option">
+            <input 
+              type="checkbox" 
+              [id]="'rating-' + rating"
+              [checked]="selectedRatings.includes(rating)"
+              (change)="toggleRating(rating)"
+              [disabled]="isLoading"
+            >
+            <label [for]="'rating-' + rating">
+              {{ getStarRating(rating) }} y más
+            </label>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Filtro de disponibilidad -->
+      <section aria-labelledby="availability-heading">
+        <h3 id="availability-heading">Disponibilidad</h3>
+        <div class="filter-option">
+          <input 
+            type="checkbox" 
+            id="stock-only"
+            [(ngModel)]="inStockOnly"
+            (change)="applyFilters()"
+            [disabled]="isLoading"
+          >
+          <label for="stock-only">Mostrar solo en stock</label>
+        </div>
+      </section>
+    </nav>
+    
+    <!-- Contenido principal -->
+    <main class="productos-main" aria-labelledby="products-heading">
+      <header class="results-header">
+        <h1 id="products-heading">Cartas Pokémon</h1>
+        <p class="results-count" aria-live="polite">
+          {{ filteredProductos.length }} {{ filteredProductos.length === 1 ? 'resultado' : 'resultados' }}
+        </p>
+        
+        <div class="sort-options">
+          <label for="sort-by">Ordenar por:</label>
+          <select 
+            id="sort-by" 
+            [(ngModel)]="sortOption" 
+            (change)="applyFilters()"
+            [disabled]="isLoading"
+          >
+            <option value="relevance">Relevancia</option>
+            <option value="price-asc">Precio: menor a mayor</option>
+            <option value="price-desc">Precio: mayor a menor</option>
+            <option value="name-asc">Nombre: A-Z</option>
+            <option value="name-desc">Nombre: Z-A</option>
+            <option value="date-asc">Más antiguos primero</option>
+            <option value="date-desc">Más recientes primero</option>
+          </select>
+        </div>
+      </header>
+      
+      @if (errorMessage) {
+        <app-error-message 
+          [message]="errorMessage" 
+          (retry)="loadInitialData()"
+          role="alert"
+        ></app-error-message>
+      }
+      
+      @if (isLoading) {
+        <app-loading-spinner aria-busy="true"></app-loading-spinner>
+      } @else {
+        <div class="productos-grid" role="list" aria-label="Lista de productos">
+          @for (producto of filteredProductos; track producto.id) {
+            <article class="producto-card" role="listitem">
+              <div class="producto-image">
+                <img 
+                  [src]="producto.imagenUrl || defaultImage" 
+                  [alt]="'Imagen de ' + producto.nombre"
+                  (error)="handleImageError($event)"
+                  loading="lazy"
+                  width="250"
+                  height="350"
+                >
+                @if (producto.stock < 5 && producto.stock > 0) {
+                  <span class="stock-badge" aria-label="Últimas unidades">¡Últimas unidades!</span>
+                }
+                @if (producto.stock === 0) {
+                  <span class="out-of-stock-badge" aria-label="Agotado">Agotado</span>
+                }
+              </div>
+              
+              <div class="producto-info">
+                <h2>{{ producto.nombre }}</h2>
+                
+                <div class="producto-meta">
+                  @if (producto.estado) {
+                    <span class="producto-condition">
+                      Estado: {{ producto.estado.descripcion }}
+                    </span>
+                  }
+                  @if (producto.fecha_creacion) {
+                    <span class="producto-date">
+                      Agregado el: {{ producto.fecha_creacion | date:'dd/MM/yyyy' }}
+                    </span>
+                  }
+                </div>
+                
+                <div class="price-section">
+                  <span class="price">{{ producto.precio | currency:'EUR':'symbol':'1.2-2' }}</span>
+                  @if (producto.precioOriginal && producto.precioOriginal > producto.precio) {
+                    <span class="original-price">{{ producto.precioOriginal | currency:'EUR':'symbol':'1.2-2' }}</span>
+                    <span class="discount-badge">
+                      {{ calculateDiscount(producto.precio, producto.precioOriginal) }}% OFF
+                    </span>
+                  }
+                </div>
+                
+                @if (producto.valoraciones && producto.valoraciones.length > 0) {
+                  <div class="rating" 
+                       [attr.aria-label]="'Valoración: ' + getAverageRating(producto.valoraciones) + ' de 5 estrellas'">
+                    <span class="stars">{{ getStarRating(getAverageRating(producto.valoraciones)) }}</span>
+                    <span class="rating-count">({{ producto.valoraciones.length }})</span>
+                  </div>
+                }
+                
+                <div class="producto-actions">
+                  <a 
+                    class="details-btn" 
+                    [routerLink]="['/producto', producto.id]"
+                    [attr.aria-label]="'Ver detalles de ' + producto.nombre"
+                  >
+                    Ver detalles
+                  </a>
+                  <button 
+                    class="add-to-cart-btn" 
+                    [disabled]="producto.stock === 0"
+                    [attr.aria-label]="'Añadir ' + producto.nombre + ' al carrito'"
+                  >
+                    Añadir al carrito
+                  </button>
+                </div>
+              </div>
+            </article>
+          } @empty {
+            <section class="empty-results" aria-live="polite">
+              <h2>No se encontraron productos</h2>
+              <p>Intenta ajustar tus filtros de búsqueda</p>
+              <button (click)="resetFilters()" aria-label="Mostrar todos los productos">
+                Mostrar todos
+              </button>
+            </section>
+          }
+        </div>
+      }
+    </main>
   </div>
 </div>
