@@ -288,19 +288,12 @@
                 }
                 
                 <div class="producto-actions">
-                  <a 
+                  <button 
                     class="details-btn" 
-                    [routerLink]="['/producto', producto.id]"
+                    (click)="openProductModal(producto)"
                     [attr.aria-label]="'Ver detalles de ' + producto.nombre"
                   >
                     Ver detalles
-                  </a>
-                  <button 
-                    class="add-to-cart-btn" 
-                    [disabled]="producto.stock === 0"
-                    [attr.aria-label]="'Añadir ' + producto.nombre + ' al carrito'"
-                  >
-                    Añadir al carrito
                   </button>
                 </div>
               </div>
@@ -318,4 +311,76 @@
       }
     </main>
   </div>
+
+  <!-- Modal de detalles del producto -->
+  @if (showModal && selectedProduct) {
+    <div class="modal-overlay" (click)="closeModal()" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <button class="close-modal" (click)="closeModal()" aria-label="Cerrar modal">
+          &times;
+        </button>
+        
+        <div class="modal-product-details">
+          <div class="modal-product-image">
+            <img 
+              [src]="selectedProduct.imagenUrl || defaultImage" 
+              [alt]="'Imagen ampliada de ' + selectedProduct.nombre"
+              (error)="handleImageError($event)"
+              loading="lazy"
+            >
+          </div>
+          
+          <div class="modal-product-info">
+            <h2 id="modal-title">{{ selectedProduct.nombre }}</h2>
+            
+            <div class="product-meta">
+              @if (selectedProduct.categoria) {
+                <p><strong>Categoría:</strong> {{ selectedProduct.categoria.nombre }}</p>
+              }
+              @if (selectedProduct.coleccion) {
+                <p><strong>Colección:</strong> {{ selectedProduct.coleccion.nombre }}</p>
+              }
+              @if (selectedProduct.rareza) {
+                <p><strong>Rareza:</strong> {{ selectedProduct.rareza.nombre }}</p>
+              }
+              @if (selectedProduct.estado) {
+                <p><strong>Estado:</strong> {{ selectedProduct.estado.descripcion }}</p>
+              }
+              @if (selectedProduct.fecha_creacion) {
+                <p><strong>Fecha:</strong> {{ selectedProduct.fecha_creacion | date:'dd/MM/yyyy' }}</p>
+              }
+              <p><strong>Stock disponible:</strong> {{ selectedProduct.stock || 0 }}</p>
+            </div>
+            
+            <div class="price-section">
+              <p class="price">{{ selectedProduct.precio | currency:'EUR':'symbol':'1.2-2' }}</p>
+              @if (selectedProduct.precioOriginal && selectedProduct.precioOriginal > selectedProduct.precio) {
+                <p class="original-price">{{ selectedProduct.precioOriginal | currency:'EUR':'symbol':'1.2-2' }}</p>
+                <p class="discount-badge">
+                  {{ calculateDiscount(selectedProduct.precio, selectedProduct.precioOriginal) }}% OFF
+                </p>
+              }
+            </div>
+            
+            @if (selectedProduct.descripcion) {
+              <div class="product-description">
+                <h3>Descripción</h3>
+                <p>{{ selectedProduct.descripcion }}</p>
+              </div>
+            }
+            
+            @if (selectedProduct.valoraciones && selectedProduct.valoraciones.length > 0) {
+              <div class="product-reviews">
+                <h3>Valoraciones</h3>
+                <div class="rating">
+                  <span class="stars">{{ getStarRating(getAverageRating(selectedProduct.valoraciones)) }}</span>
+                  <span class="rating-count">({{ selectedProduct.valoraciones.length }} valoraciones)</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 </div>

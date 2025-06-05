@@ -1,6 +1,10 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+/**
+ * Componente para mostrar mensajes de error de forma reutilizable.
+ * Recibe un mensaje por input y lo muestra con un icono de advertencia.
+ */
 @Component({
   selector: 'app-error-message',
   standalone: true,
@@ -15,5 +19,6 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./error-message.component.css']
 })
 export class ErrorMessageComponent {
+  /** Mensaje de error a mostrar */
   @Input() message: string | null = null;
 }

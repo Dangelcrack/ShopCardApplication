@@ -1,0 +1,194 @@
+/* Estilos generales */
+.about-us {
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Hero section */
+.hero-section {
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+              url('https://images.unsplash.com/photo-1608889825103-eb5b377737f8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+  background-size: cover;
+  background-position: center;
+  color: white;
+  text-align: center;
+  padding: 100px 20px;
+  margin-bottom: 40px;
+}
+
+.hero-content h1 {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.tagline {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  font-weight: 300;
+}
+
+.since {
+  font-size: 1.1rem;
+  font-style: italic;
+}
+
+/* Why us section */
+.why-us {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.why-us h2 {
+  font-size: 2rem;
+  margin-bottom: 40px;
+  color: #2c3e50;
+  position: relative;
+  display: inline-block;
+}
+
+.why-us h2::after {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 3px;
+  background: #e74c3c;
+  bottom: -10px;
+  left: 25%;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.feature-card {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.feature-card .material-icons {
+  font-size: 3rem;
+  color: #e74c3c;
+  margin-bottom: 20px;
+}
+
+.feature-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
+/* Info sections */
+.info-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 60px;
+}
+
+.store-info {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.store-info h2 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  text-align: center;
+}
+
+.info-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.info-item .material-icons {
+  font-size: 1.8rem;
+  color: #e74c3c;
+  margin-right: 15px;
+}
+
+.info-item p {
+  margin: 0;
+}
+
+.info-item strong {
+  color: #2c3e50;
+}
+
+.map-container {
+  height: 400px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 60px 20px;
+  }
+  
+  .hero-content h1 {
+    font-size: 2.2rem;
+  }
+  
+  .tagline {
+    font-size: 1.2rem;
+  }
+  
+  .info-sections {
+    grid-template-columns: 1fr;
+  }
+  
+  .map-container {
+    height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hero-content h1 {
+    font-size: 1.8rem;
+  }
+  
+  .tagline {
+    font-size: 1rem;
+  }
+  
+  .since {
+    font-size: 0.9rem;
+  }
+}

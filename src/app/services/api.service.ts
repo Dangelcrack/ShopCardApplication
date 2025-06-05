@@ -5,13 +5,22 @@ import { catchError, map } from 'rxjs/operators';
 import { Producto } from '../models/producto.model';
 import { environment } from '../../environments/environment';
 
+/**
+ * Servicio general para interactuar con la API RESTful.
+ * Proporciona métodos CRUD y de consulta para productos y relaciones.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
+  /** URL base de la API, definida en el environment */
   private apiUrl = environment.apiUrl; // https://monarch-sweeping-flounder.ngrok-free.app
+  /** Encabezados HTTP por defecto para todas las peticiones */
   private defaultHeaders: HttpHeaders;
 
+  /**
+   * Inyecta HttpClient y configura los encabezados por defecto.
+   */
   constructor(private http: HttpClient) { 
     this.defaultHeaders = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -21,6 +30,11 @@ export class ApiService {
     });
   }
 
+  /**
+   * Maneja errores de las peticiones HTTP y devuelve mensajes personalizados.
+   * @param error Error HTTP recibido
+   * @returns Observable que lanza un error con mensaje amigable
+   */
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Error desconocido en la comunicación con el servidor';
     
@@ -45,6 +59,11 @@ export class ApiService {
   }
 
   // Métodos para productos
+
+  /**
+   * Obtiene todos los productos.
+   * @returns Observable con la lista de productos
+   */
   getAllProductos(): Observable<Producto[]> {
     return this.http.get<Producto[]>(`${this.apiUrl}/api/productos`, {
       headers: this.defaultHeaders,
@@ -60,6 +79,11 @@ export class ApiService {
     );
   }
 
+  /**
+   * Busca productos por nombre.
+   * @param nombre Nombre a buscar
+   * @returns Observable con la lista de productos encontrados
+   */
   searchByNombre(nombre: string): Observable<Producto[]> {
     if (!nombre || nombre.trim().length === 0) {
       return throwError(() => new Error('El término de búsqueda no puede estar vacío'));
@@ -82,6 +106,11 @@ export class ApiService {
     );
   }
 
+  /**
+   * Obtiene un producto por su ID.
+   * @param id ID del producto
+   * @returns Observable con el producto encontrado
+   */
   getProductoById(id: number): Observable<Producto> {
     if (!id || id <= 0) {
       return throwError(() => new Error('ID de producto inválido'));
@@ -101,6 +130,11 @@ export class ApiService {
     );
   }
 
+  /**
+   * Crea un nuevo producto.
+   * @param producto Objeto producto a crear
+   * @returns Observable con el producto creado
+   */
   createProducto(producto: Producto): Observable<Producto> {
     if (!producto) {
       return throwError(() => new Error('Datos del producto no proporcionados'));
@@ -120,6 +154,12 @@ export class ApiService {
     );
   }
 
+  /**
+   * Actualiza un producto existente.
+   * @param id ID del producto a actualizar
+   * @param producto Objeto producto actualizado
+   * @returns Observable con el producto actualizado
+   */
   updateProducto(id: number, producto: Producto): Observable<Producto> {
     if (!id || id <= 0) {
       return throwError(() => new Error('ID de producto inválido'));
@@ -142,6 +182,11 @@ export class ApiService {
     );
   }
 
+  /**
+   * Elimina un producto por su ID.
+   * @param id ID del producto a eliminar
+   * @returns Observable vacío
+   */
   deleteProducto(id: number): Observable<void> {
     if (!id || id <= 0) {
       return throwError(() => new Error('ID de producto inválido'));
@@ -157,6 +202,12 @@ export class ApiService {
   }
 
   // Métodos para relaciones
+
+  /**
+   * Obtiene productos por categoría.
+   * @param categoriaId ID de la categoría
+   * @returns Observable con la lista de productos
+   */
   getByCategoria(categoriaId: number): Observable<Producto[]> {
     if (!categoriaId || categoriaId <= 0) {
       return throwError(() => new Error('ID de categoría inválido'));
@@ -176,6 +227,11 @@ export class ApiService {
     );
   }
 
+  /**
+   * Obtiene productos por colección.
+   * @param coleccionId ID de la colección
+   * @returns Observable con la lista de productos
+   */
   getByColeccion(coleccionId: number): Observable<Producto[]> {
     if (!coleccionId || coleccionId <= 0) {
       return throwError(() => new Error('ID de colección inválido'));
@@ -195,6 +251,11 @@ export class ApiService {
     );
   }
 
+  /**
+   * Obtiene productos por rareza.
+   * @param rarezaId ID de la rareza
+   * @returns Observable con la lista de productos
+   */
   getByRareza(rarezaId: number): Observable<Producto[]> {
     if (!rarezaId || rarezaId <= 0) {
       return throwError(() => new Error('ID de rareza inválido'));
@@ -214,6 +275,11 @@ export class ApiService {
     );
   }
 
+  /**
+   * Obtiene productos por estado.
+   * @param estadoId ID del estado
+   * @returns Observable con la lista de productos
+   */
   getByEstado(estadoId: number): Observable<Producto[]> {
     if (!estadoId || estadoId <= 0) {
       return throwError(() => new Error('ID de estado inválido'));
